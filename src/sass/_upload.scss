@@ -1,0 +1,329 @@
+.add-recipe-window {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100rem;
+  background-color: white;
+  border-radius: 9px;
+
+  padding: 5rem 6rem;
+  box-shadow: 0 4rem 6rem rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  transition: all 0.5s;
+
+  .btn--close-modal {
+    font-family: inherit;
+    color: inherit;
+    position: absolute;
+    top: 0.5rem;
+    right: 1.6rem;
+    font-size: 3.5rem;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  transition: all 0.5s;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+}
+
+@import "variables";
+
+.upload {
+  padding: $spacing-xxl;
+  background: $color-white;
+
+  @media only screen and (max-width: $bp-medium) {
+    padding: $spacing-xl;
+  }
+
+  @media only screen and (max-width: $bp-small) {
+    padding: $spacing-lg;
+  }
+
+  // Form Layout
+  &__column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-xxl;
+    margin-bottom: $spacing-xl;
+
+    @media only screen and (max-width: $bp-medium) {
+      grid-template-columns: 1fr;
+      gap: $spacing-xl;
+    }
+  }
+
+  &__heading {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-grey-dark-3;
+    margin-bottom: $spacing-lg;
+    position: relative;
+    padding-bottom: $spacing-sm;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 4rem;
+      height: 3px;
+      background: $gradient-primary;
+      border-radius: $border-radius-sm;
+    }
+  }
+
+  &__btn {
+    grid-column: 1 / -1;
+    justify-self: center;
+    margin-top: $spacing-lg;
+    padding: $spacing-md $spacing-xxl;
+    font-size: $font-size-base;
+  }
+
+  // Form Fields
+  label {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-grey-dark-2;
+    margin-bottom: $spacing-xs;
+    margin-top: $spacing-md;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: $spacing-md;
+    border: 2px solid $color-grey-light-2;
+    border-radius: $border-radius-md;
+    font-size: $font-size-sm;
+    font-family: inherit;
+    color: $color-grey-dark-1;
+    background: $color-white;
+    transition: $transition-fast;
+
+    &::placeholder {
+      color: $color-grey-light-4;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+    }
+
+    &:hover:not(:focus) {
+      border-color: $color-grey-light-3;
+    }
+  }
+
+  // Ingredient Management
+  &__ingredient {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: $spacing-sm;
+    align-items: end;
+    margin-bottom: $spacing-md;
+
+    @media only screen and (max-width: $bp-small) {
+      grid-template-columns: 1fr;
+      gap: $spacing-xs;
+    }
+  }
+
+  &__ingredient-input {
+    grid-column: 1;
+  }
+
+  &__ingredient-btn {
+    @extend .btn--small;
+    grid-column: 2;
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-xs;
+
+    @media only screen and (max-width: $bp-small) {
+      grid-column: 1;
+      justify-self: start;
+    }
+  }
+
+  &__ingredient-list {
+    list-style: none;
+    margin-top: $spacing-lg;
+    border: 2px solid $color-grey-light-2;
+    border-radius: $border-radius-md;
+    overflow: hidden;
+  }
+
+  &__ingredient-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md;
+    border-bottom: 1px solid $color-grey-light-2;
+    transition: $transition-fast;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: $color-grey-light-1;
+    }
+  }
+
+  &__ingredient-text {
+    flex: 1;
+    font-size: $font-size-sm;
+    color: $color-grey-dark-2;
+    margin-right: $spacing-md;
+  }
+
+  &__ingredient-remove {
+    @extend .btn--tiny;
+    color: $color-primary;
+    background: transparent;
+
+    &:hover {
+      color: $color-primary-dark;
+      background: $color-grey-light-1;
+    }
+  }
+
+  // Directions Section
+  &__directions {
+    grid-column: 1 / -1;
+    margin-top: $spacing-xl;
+  }
+
+  &__directions-textarea {
+    min-height: 15rem;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.6;
+  }
+
+  // Image Upload
+  &__image {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: $spacing-xl;
+    padding: $spacing-xl;
+    border: 2px dashed $color-grey-light-3;
+    border-radius: $border-radius-lg;
+    background: $color-grey-light-1;
+    transition: $transition-normal;
+
+    &:hover {
+      border-color: $color-primary;
+      background: rgba($color-primary, 0.05);
+    }
+  }
+
+  &__image-input {
+    display: none;
+  }
+
+  &__image-label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $color-primary;
+    cursor: pointer;
+    padding: $spacing-md $spacing-lg;
+    border-radius: $border-radius-md;
+    transition: $transition-fast;
+
+    &:hover {
+      background: $color-primary;
+      color: $color-white;
+      transform: translateY(-2px);
+    }
+
+    svg {
+      width: 2rem;
+      height: 2rem;
+      fill: currentColor;
+    }
+  }
+
+  &__image-preview {
+    margin-top: $spacing-lg;
+    max-width: 100%;
+    border-radius: $border-radius-md;
+    overflow: hidden;
+    box-shadow: $shadow-light;
+    display: none;
+
+    &.has-image {
+      display: block;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  }
+
+  // Form Validation Styles
+  input:invalid,
+  textarea:invalid {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+  }
+
+  // Success State
+  &--success {
+    .upload__btn {
+      background: $gradient-secondary;
+      
+      &:hover {
+        background: $gradient-accent;
+      }
+    }
+  }
+
+  // Loading State
+  &--loading {
+    .upload__btn {
+      position: relative;
+      color: transparent;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 2rem;
+        height: 2rem;
+        border: 2px solid transparent;
+        border-top: 2px solid $color-white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+}
