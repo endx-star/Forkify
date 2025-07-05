@@ -1,4 +1,4 @@
-@import "variables";
+@use "variables" as *;
 
 .search-results {
   grid-area: list;
@@ -158,9 +158,18 @@
     }
 
     &__btn {
-      @extend .btn--inline;
-      font-size: $font-size-sm;
+      background: $color-primary;
+      color: $color-white;
+      border: none;
+      border-radius: $border-radius-md;
+      cursor: pointer;
+      transition: $transition-fast;
       padding: $spacing-sm $spacing-md;
+      font-size: $font-size-sm;
+
+      &:hover {
+        background: $color-primary-dark;
+      }
 
       &--prev {
         margin-right: auto;

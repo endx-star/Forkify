@@ -1,3 +1,6 @@
+@use "variables" as *;
+@use "sass:color";
+
 // $color-primary: #f59a83;
 $color-primary: #f38e82;
 $color-grad-1: #fbdb89;
@@ -69,8 +72,6 @@ body {
     border-radius: 0;
   }
 }
-
-@import "variables";
 
 .preview {
   &__link {
@@ -170,7 +171,7 @@ body {
   }
 
   &__user-generated {
-    background-color: darken($color-grey-light-2, 2%);
+    background-color: #e0e0e0;
 
     display: flex;
     align-items: center;

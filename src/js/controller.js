@@ -1,5 +1,7 @@
 import * as model from '../model.js';
 import RecipeView from '../view/recipeView.js';
+import SearchView from '../view/searchView.js';
+import ResultsView from '../view/resultsView.js';
 
 import icons from 'url:../img/icons.svg';
 import 'core-js/stable';
@@ -16,15 +18,15 @@ const timeout = function (s) {
 };
 
 // Helper to render spinner
-// const renderSpinner = function (parentEl) {
-//   parentEl.innerHTML = `
-//     <div class="spinner">
-//       <svg>
-//         <use href="${icons}#icon-loader"></use>
-//       </svg>
-//     </div>
-//   `;
-// };
+const renderSpinner = function (parentEl) {
+  parentEl.innerHTML = `
+    <div class="spinner">
+      <svg>
+        <use href="${icons}#icon-loader"></use>
+      </svg>
+    </div>
+  `;
+};
 
 // Helper to render error
 const renderError = function (parentEl, message = 'Could not load recipe!') {
@@ -43,23 +45,49 @@ const renderError = function (parentEl, message = 'Could not load recipe!') {
 //   parentEl.innerHTML = 
 // };
 
-// Async function to load and show a recipe from API
+// Search controller
+const controlSearchResults = async function() {
+    try {
+        // 1) Get search query
+        const query = SearchView.getQuery();
+        if (!query) return;
+
+        // 2) Load search results
+        ResultsView.renderSpinner();
+        await model.loadSearchResults(query);
+
+        // 3) Render results
+        ResultsView.render(model.getSearchResultsPage());
+
+    } catch (err) {
+        ResultsView.renderError(err.message);
+    }
+};
+
+// Recipe controller
 const controlRecipes = async function() {
   const id = window.location.hash.slice(1);
 
   //Check for id
   if (!id) return;
-  renderSpinner(recipeContainer);
+  RecipeView.renderSpinner();
 
-  //Load recipe
-  await model.loadRecipe(id);
-  const {recipe} = model.state;
+  try {
+    //Load recipe
+    await model.loadRecipe(id);
+    const {recipe} = model.state;
 
-
-  //Render recipe
-  RecipeView.render(model.state.recipe);
+    //Render recipe
+    RecipeView.render(model.state.recipe);
+  } catch (err) {
+    RecipeView.renderError(err.message);
+  }
 }
 
-// load a recipe on page load
+// Event handlers
+const init = function() {
+    SearchView.addHandlerSearch(controlSearchResults);
+    ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, controlRecipes));
+}
 
-['hashchange', 'load'].forEach(ev => window.addEventListener(ev, controlRecipes));
+init();

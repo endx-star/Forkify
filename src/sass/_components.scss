@@ -1,4 +1,4 @@
-@import "variables";
+@use "variables" as *;
 
 // Button Base Mixin
 %btn-base {
@@ -15,12 +15,12 @@
   transition: $transition-normal;
   position: relative;
   overflow: hidden;
-  
+
   &:focus {
     outline: 2px solid $color-primary;
     outline-offset: 2px;
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -36,17 +36,17 @@
   padding: $spacing-md $spacing-xl;
   font-size: $font-size-sm;
   box-shadow: $shadow-light;
-  
+
   &:hover:not(:disabled) {
     background: $gradient-secondary;
     transform: translateY(-2px);
     box-shadow: $shadow-medium;
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
-  
+
   svg {
     width: 2rem;
     height: 2rem;
@@ -62,13 +62,13 @@
   padding: $spacing-sm $spacing-md;
   font-size: $font-size-xs;
   box-shadow: $shadow-light;
-  
+
   &:hover:not(:disabled) {
     background: $gradient-secondary;
     transform: translateY(-1px);
     box-shadow: $shadow-medium;
   }
-  
+
   svg {
     width: 1.6rem;
     height: 1.6rem;
@@ -84,13 +84,13 @@
   padding: $spacing-xs $spacing-md;
   font-size: $font-size-xs;
   border-radius: $border-radius-full;
-  
+
   &:hover:not(:disabled) {
     background: $color-grey-light-2;
     color: $color-primary-dark;
     transform: translateY(-1px);
   }
-  
+
   svg {
     width: 1.4rem;
     height: 1.4rem;
@@ -108,13 +108,13 @@
   border-radius: 50%;
   padding: 0;
   box-shadow: $shadow-light;
-  
+
   &:hover:not(:disabled) {
     background: $gradient-secondary;
     transform: scale(1.1);
     box-shadow: $shadow-medium;
   }
-  
+
   svg {
     width: 2.4rem;
     height: 2.4rem;
@@ -131,13 +131,13 @@
   height: 2.4rem;
   padding: 0;
   border-radius: $border-radius-sm;
-  
+
   &:hover:not(:disabled) {
     background: $color-grey-light-1;
     color: $color-primary-dark;
     transform: scale(1.1);
   }
-  
+
   svg {
     width: 100%;
     height: 100%;
@@ -159,7 +159,7 @@
   right: $spacing-md;
   font-size: $font-size-lg;
   font-weight: $font-weight-bold;
-  
+
   &:hover {
     background: $color-grey-light-3;
     color: $color-grey-dark-3;
@@ -175,9 +175,9 @@
   text-align: center;
   margin-bottom: $spacing-xl;
   position: relative;
-  
+
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -$spacing-sm;
     left: 50%;
@@ -194,7 +194,7 @@
   color: $color-primary;
   text-decoration: none;
   transition: $transition-fast;
-  
+
   &:hover {
     color: $color-primary-dark;
     text-decoration: underline;
@@ -207,7 +207,7 @@
   justify-content: center;
   align-items: center;
   padding: $spacing-xxl;
-  
+
   svg {
     width: 6rem;
     height: 6rem;
@@ -235,7 +235,7 @@
   text-align: center;
   max-width: 50rem;
   margin: 0 auto;
-  
+
   svg {
     width: 4rem;
     height: 4rem;
@@ -243,7 +243,7 @@
     margin-right: $spacing-md;
     flex-shrink: 0;
   }
-  
+
   p {
     font-size: $font-size-lg;
     color: $color-grey-dark-2;
@@ -256,7 +256,7 @@
   svg {
     fill: $color-primary;
   }
-  
+
   p {
     color: $color-grey-dark-3;
   }
@@ -275,12 +275,12 @@
   opacity: 0;
   visibility: hidden;
   transition: $transition-normal;
-  
+
   &.hidden {
     opacity: 0;
     visibility: hidden;
   }
-  
+
   &:not(.hidden) {
     opacity: 1;
     visibility: visible;
@@ -304,13 +304,13 @@
   opacity: 0;
   visibility: hidden;
   transition: $transition-normal;
-  
+
   &.hidden {
     opacity: 0;
     visibility: hidden;
     transform: translate(-50%, -50%) scale(0.9);
   }
-  
+
   &:not(.hidden) {
     opacity: 1;
     visibility: visible;
@@ -321,7 +321,7 @@
 // Footer
 .footer {
   width: 100vw;
-  background: $gradient-primary;
+  background-image: linear-gradient(to bottom right, #fbdb89, #f48982);
   color: $color-white;
   text-align: center;
   padding: $spacing-lg 0 $spacing-md 0;
