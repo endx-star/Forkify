@@ -1,4 +1,4 @@
-import * as model from '../model.js';
+import * as model from './model.js';
 import RecipeView from '../view/recipeView.js';
 import SearchView from '../view/searchView.js';
 import ResultsView from '../view/resultsView.js';
