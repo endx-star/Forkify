@@ -6,6 +6,7 @@ class SearchView {
 
     getQuery() {
         const query = this.#parentElement.querySelector('.search__field').value;
+        console.log('SearchView.getQuery() called, query:', query);
         this.#clearInput();
         return query;
     }
@@ -15,8 +16,10 @@ class SearchView {
     }
 
     addHandlerSearch(handler) {
+        console.log('SearchView.addHandlerSearch() called');
         this.#parentElement.addEventListener('submit', function(e) {
             e.preventDefault();
+            console.log('Search form submitted');
             handler();
         });
     }

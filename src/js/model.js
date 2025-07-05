@@ -1,8 +1,12 @@
-import { async } from 'regenerator-runtime';
-import { API_URL } from './config';
-import { getJSON } from './helpers';
+// Model for managing application state and API calls
 
-
+const timeout = function (s) {
+  return new Promise(function (_, reject) {
+    setTimeout(function () {
+      reject(new Error(`Request took too long! Timeout after ${s} second`));
+    }, s * 1000);
+  });
+};
 
 export const state = {
     recipe: {},
@@ -17,9 +21,12 @@ export const state = {
 
 export const loadRecipe = async function (id) {
     try {
-       const data = await getJSON(`${API_URL}/${id}`)
-
-
+        const res = await Promise.race([
+          fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`),
+          timeout(10),
+        ]);
+        const data = await res.json();
+        if (!res.ok) throw new Error(`${data.message} (${res.status})`);
         const recipe = data.data.recipe;
         
         // Update state
@@ -33,14 +40,16 @@ export const loadRecipe = async function (id) {
 
 export const loadSearchResults = async function(query) {
     try {
+        console.log('Loading search results for:', query);
         state.search.query = query;
         
         const res = await Promise.race([
-            fetch(`${API_URL}?search=${query}`),
+            fetch(`https://forkify-api.herokuapp.com/api/v2/recipes?search=${query}`),
             timeout(10),
         ]);
         
         const data = await res.json();
+        console.log('API response:', data);
         
         if (!res.ok) throw new Error(`${data.message} (${res.status})`);
         
@@ -54,9 +63,11 @@ export const loadSearchResults = async function(query) {
             };
         });
         
+        console.log('Processed results:', state.search.results);
         state.search.page = 1;
         
     } catch (err) {
+        console.error('Error in loadSearchResults:', err);
         throw err;
     }
 }
@@ -68,4 +79,8 @@ export const getSearchResultsPage = function(page = state.search.page) {
     const end = page * state.search.resultsPerPage;
     
     return state.search.results.slice(start, end);
+}
+
+export const getSearchResultsPageCount = function() {
+    return Math.ceil(state.search.results.length / state.search.resultsPerPage);
 }

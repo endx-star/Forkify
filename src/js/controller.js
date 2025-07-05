@@ -2,6 +2,7 @@ import * as model from './model.js';
 import RecipeView from '../view/recipeView.js';
 import SearchView from '../view/searchView.js';
 import ResultsView from '../view/resultsView.js';
+import PaginationView from '../view/paginationView.js';
 
 import icons from 'url:../img/icons.svg';
 import 'core-js/stable';
@@ -50,18 +51,37 @@ const controlSearchResults = async function() {
     try {
         // 1) Get search query
         const query = SearchView.getQuery();
+        console.log('Search query:', query);
         if (!query) return;
 
         // 2) Load search results
         ResultsView.renderSpinner();
         await model.loadSearchResults(query);
+        console.log('Search results:', model.state.search.results);
 
         // 3) Render results
-        ResultsView.render(model.getSearchResultsPage());
+        controlPagination();
 
     } catch (err) {
+        console.error('Search error:', err);
         ResultsView.renderError(err.message);
     }
+};
+
+// Pagination controller
+const controlPagination = function(goToPage = 1) {
+    console.log('Pagination - page:', goToPage);
+    const results = model.getSearchResultsPage(goToPage);
+    console.log('Results for page:', results);
+    
+    // 1) Render new results
+    ResultsView.render(results);
+
+    // 2) Render new pagination buttons
+    PaginationView.render({
+        page: model.state.search.page,
+        numPages: model.getSearchResultsPageCount(),
+    });
 };
 
 // Recipe controller
@@ -86,7 +106,9 @@ const controlRecipes = async function() {
 
 // Event handlers
 const init = function() {
+    console.log('Initializing app...');
     SearchView.addHandlerSearch(controlSearchResults);
+    PaginationView.addHandlerClick(controlPagination);
     ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, controlRecipes));
 }
 

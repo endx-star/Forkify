@@ -7,8 +7,10 @@ class ResultsView {
     #message = '';
 
     render(data) {
+        console.log('ResultsView.render called with:', data);
         this.#data = data;
         const markup = this.#generateMarkup();
+        console.log('Generated markup:', markup);
         this.#clear();
         this.#parentElement.insertAdjacentHTML('afterbegin', markup);
     }
@@ -45,10 +47,12 @@ class ResultsView {
     }
 
     #generateMarkup() {
+        console.log('Generating markup for data:', this.#data);
         return this.#data.map(result => this.#generateMarkupPreview(result)).join('');
     }
 
     #generateMarkupPreview(result) {
+        console.log('Generating preview for result:', result);
         const id = window.location.hash.slice(1);
         
         return `
