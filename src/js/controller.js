@@ -76,8 +76,11 @@ const controlPagination = function(goToPage = 1) {
     
     // 1) Render new results
     ResultsView.render(results);
+    
+    // 2) Update active state after rendering
+    ResultsView.updateActiveRecipe();
 
-    // 2) Render new pagination buttons
+    // 3) Render new pagination buttons
     PaginationView.render({
         page: model.state.search.page,
         numPages: model.getSearchResultsPageCount(),
@@ -87,6 +90,7 @@ const controlPagination = function(goToPage = 1) {
 // Recipe controller
 const controlRecipes = async function() {
   const id = window.location.hash.slice(1);
+  console.log('controlRecipes called, hash:', window.location.hash, 'id:', id);
 
   //Check for id
   if (!id) return;
@@ -94,14 +98,26 @@ const controlRecipes = async function() {
 
   try {
     //Load recipe
+    console.log('Loading recipe with id:', id);
     await model.loadRecipe(id);
     const {recipe} = model.state;
+    console.log('Recipe loaded:', recipe);
 
     //Render recipe
     RecipeView.render(model.state.recipe);
+    
+    // Update active state in results
+    ResultsView.updateActiveRecipe();
   } catch (err) {
+    console.error('Error loading recipe:', err);
     RecipeView.renderError(err.message);
   }
+}
+
+// Recipe click handler
+const controlRecipeClick = function(id) {
+  console.log('Recipe clicked, updating hash to:', id);
+  window.location.hash = id;
 }
 
 // Event handlers
@@ -109,7 +125,13 @@ const init = function() {
     console.log('Initializing app...');
     SearchView.addHandlerSearch(controlSearchResults);
     PaginationView.addHandlerClick(controlPagination);
-    ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, controlRecipes));
+    ResultsView.addHandlerClick(controlRecipeClick);
+    
+    // Add event listeners for recipe loading
+    window.addEventListener('hashchange', controlRecipes);
+    window.addEventListener('load', controlRecipes);
+    
+    console.log('Event listeners added for hashchange and load');
 }
 
 init();

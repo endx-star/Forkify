@@ -74,6 +74,36 @@ class ResultsView {
             </li>
         `;
     }
+
+    addHandlerClick(handler) {
+        this.#parentElement.addEventListener('click', function(e) {
+            const link = e.target.closest('.preview__link');
+            if (!link) return;
+            
+            e.preventDefault();
+            const id = link.getAttribute('href').slice(1);
+            console.log('Recipe clicked, id:', id);
+            
+            // Update active state
+            document.querySelectorAll('.preview__link').forEach(link => {
+                link.classList.remove('preview__link--active');
+            });
+            link.classList.add('preview__link--active');
+            
+            handler(id);
+        });
+    }
+
+    // Method to update active state when hash changes
+    updateActiveRecipe() {
+        const id = window.location.hash.slice(1);
+        document.querySelectorAll('.preview__link').forEach(link => {
+            link.classList.remove('preview__link--active');
+            if (link.getAttribute('href') === `#${id}`) {
+                link.classList.add('preview__link--active');
+            }
+        });
+    }
 }
 
 export default new ResultsView(); 

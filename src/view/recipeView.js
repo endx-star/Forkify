@@ -14,8 +14,23 @@ class RecipeView {
             </div>
         `;
 
-        this.#parentElement.innerHTML = ''
-        this.#parentElement.insertAdjacentElement('afterbegin', markup)
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+    }
+
+    renderError(message = 'Could not load recipe!') {
+        const markup = `
+            <div class="error">
+                <div>
+                    <svg>
+                        <use href="${icons}#icon-alert-triangle"></use>
+                    </svg>
+                </div>
+                <p>${message}</p>
+            </div>
+        `;
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup);
     }
 
     render(data) {

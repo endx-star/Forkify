@@ -55,6 +55,7 @@
     width: 80%;
     line-height: 1.2;
     z-index: 2;
+    animation: titleEntrance 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 
     @media only screen and (max-width: $bp-medium) {
       font-size: $font-size-2xl;
@@ -72,6 +73,20 @@
       border-radius: $border-radius-md;
       box-shadow: $shadow-medium;
       display: inline-block;
+      animation: titleSpanEntrance 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        animation: shimmer 2s ease-in-out infinite;
+      }
     }
   }
 
@@ -312,5 +327,66 @@
       line-height: 1.5;
       max-width: 40rem;
     }
+  }
+}
+
+// Recipe Title Animation Keyframes
+@keyframes titleEntrance {
+  0% {
+    transform: translate(-50%, 100%) scale(0.8);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  
+  50% {
+    transform: translate(-50%, 40%) scale(1.1);
+    opacity: 0.7;
+    filter: blur(3px);
+  }
+  
+  100% {
+    transform: translate(-50%, 20%) scale(1);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes titleSpanEntrance {
+  0% {
+    transform: scale(0.5) rotate(-5deg);
+    opacity: 0;
+    background: $gradient-secondary;
+  }
+  
+  30% {
+    transform: scale(1.2) rotate(2deg);
+    opacity: 0.8;
+    background: $gradient-accent;
+  }
+  
+  60% {
+    transform: scale(0.95) rotate(-1deg);
+    opacity: 0.9;
+    background: $gradient-primary;
+  }
+  
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    background: $gradient-primary;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  
+  50% {
+    left: 100%;
+  }
+  
+  100% {
+    left: 100%;
   }
 }

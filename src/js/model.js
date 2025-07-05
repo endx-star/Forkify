@@ -21,19 +21,23 @@ export const state = {
 
 export const loadRecipe = async function (id) {
     try {
+        console.log('loadRecipe called with id:', id);
         const res = await Promise.race([
           fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`),
           timeout(10),
         ]);
         const data = await res.json();
+        console.log('Recipe API response:', data);
         if (!res.ok) throw new Error(`${data.message} (${res.status})`);
         const recipe = data.data.recipe;
         
         // Update state
         state.recipe = recipe;
+        console.log('Recipe state updated:', state.recipe);
         
         return recipe;
     } catch (err) {
+        console.error('Error in loadRecipe:', err);
         throw err;
     }
 }
