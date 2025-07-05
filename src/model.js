@@ -1,0 +1,22 @@
+import { async } from 'regenerator-runtime';
+
+export const state = {
+    recipe: {},
+}
+
+export const loadRecipe = async function (id) {
+
+    try {
+       
+        const res = await Promise.race([
+          fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`),
+          timeout(10),
+        ]);
+        const data = await res.json();
+        if (!res.ok) throw new Error(`${data.message} (${res.status})`);
+        const recipe = data.data.recipe;
+        renderRecipe(recipeContainer, recipe);
+      } catch (err) {
+        renderError(recipeContainer, err.message);
+      }
+}
