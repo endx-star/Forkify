@@ -3,6 +3,7 @@ import RecipeView from '../view/recipeView.js';
 import SearchView from '../view/searchView.js';
 import ResultsView from '../view/resultsView.js';
 import PaginationView from '../view/paginationView.js';
+import AddRecipeView from '../view/addRecipeView.js';
 
 import icons from 'url:../img/icons.svg';
 import 'core-js/stable';
@@ -120,12 +121,42 @@ const controlRecipeClick = function(id) {
   window.location.hash = id;
 }
 
+// Add recipe controller
+const controlAddRecipe = async function(newRecipe) {
+    try {
+        console.log('Adding new recipe:', newRecipe);
+        
+        // Show loading state
+        AddRecipeView.renderSpinner();
+        
+        // Upload recipe
+        const recipe = await model.uploadRecipe(newRecipe);
+        console.log('Recipe uploaded:', recipe);
+        
+        // Hide modal
+        AddRecipeView.hideModal();
+        
+        // Show success message
+        AddRecipeView.renderMessage('Recipe uploaded successfully!');
+        
+        // Update results to show new recipe
+        controlPagination();
+        
+    } catch (err) {
+        console.error('Error adding recipe:', err);
+        AddRecipeView.renderError('Failed to upload recipe. Please try again.');
+    }
+}
+
 // Event handlers
 const init = function() {
     console.log('Initializing app...');
     SearchView.addHandlerSearch(controlSearchResults);
     PaginationView.addHandlerClick(controlPagination);
     ResultsView.addHandlerClick(controlRecipeClick);
+    AddRecipeView.addHandlerShowModal();
+    AddRecipeView.addHandlerHideModal();
+    AddRecipeView.addHandlerUpload(controlAddRecipe);
     
     // Add event listeners for recipe loading
     window.addEventListener('hashchange', controlRecipes);

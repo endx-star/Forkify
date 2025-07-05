@@ -10,6 +10,15 @@ class AddRecipeView {
         this.#clear();
         this.#parentElement.insertAdjacentHTML('afterbegin', markup);
         this.#showModal();
+        
+        // Set up close button event listener after rendering
+        const closeBtn = this.#parentElement.querySelector('.btn--close-modal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                console.log('Close button clicked');
+                this.hideModal();
+            });
+        }
     }
 
     #clear() {
@@ -117,22 +126,67 @@ class AddRecipeView {
     }
 
     addHandlerHideModal() {
-        document.querySelector('.btn--close-modal').addEventListener('click', () => {
-            this.hideModal();
-        });
-        
-        this.#overlay.addEventListener('click', () => {
-            this.hideModal();
+        // Close on overlay click
+        this.#overlay.addEventListener('click', (e) => {
+            if (e.target === this.#overlay) {
+                console.log('Overlay clicked');
+                this.hideModal();
+            }
         });
     }
 
     addHandlerUpload(handler) {
-        this.#parentElement.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            handler(data);
+        // Use event delegation for form submission
+        document.addEventListener('submit', (e) => {
+            if (e.target.closest('.upload')) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                handler(data);
+            }
         });
+    }
+
+    renderSpinner() {
+        const markup = `
+            <div class="spinner">
+                <svg>
+                    <use href="${icons}#icon-loader"></use>
+                </svg>
+            </div>
+        `;
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+    }
+
+    renderMessage(message) {
+        const markup = `
+            <div class="message">
+                <div>
+                    <svg>
+                        <use href="${icons}#icon-smile"></use>
+                    </svg>
+                </div>
+                <p>${message}</p>
+            </div>
+        `;
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+    }
+
+    renderError(message) {
+        const markup = `
+            <div class="error">
+                <div>
+                    <svg>
+                        <use href="${icons}#icon-alert-triangle"></use>
+                    </svg>
+                </div>
+                <p>${message}</p>
+            </div>
+        `;
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup);
     }
 }
 

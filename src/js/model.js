@@ -88,3 +88,51 @@ export const getSearchResultsPage = function(page = state.search.page) {
 export const getSearchResultsPageCount = function() {
     return Math.ceil(state.search.results.length / state.search.resultsPerPage);
 }
+
+export const uploadRecipe = async function(newRecipe) {
+    try {
+        console.log('Uploading recipe:', newRecipe);
+        
+        // Parse ingredients
+        const ingredients = [];
+        for (let i = 1; i <= 6; i++) {
+            const ingredient = newRecipe[`ingredient-${i}`];
+            if (ingredient) {
+                const [quantity, unit, description] = ingredient.split(',').map(item => item.trim());
+                if (description) {
+                    ingredients.push({
+                        quantity: quantity ? +quantity : null,
+                        unit: unit || '',
+                        description: description
+                    });
+                }
+            }
+        }
+
+        const recipe = {
+            title: newRecipe.title,
+            source_url: newRecipe.sourceUrl,
+            image_url: newRecipe.image,
+            publisher: newRecipe.publisher,
+            cooking_time: +newRecipe.cookingTime,
+            servings: +newRecipe.servings,
+            ingredients: ingredients
+        };
+
+        console.log('Processed recipe:', recipe);
+        
+        // In a real app, you would send this to your API
+        // For now, we'll just add it to the state
+        const newRecipeId = Date.now().toString();
+        recipe.id = newRecipeId;
+        recipe.key = 'user-generated';
+        
+        // Add to search results
+        state.search.results.unshift(recipe);
+        
+        return recipe;
+    } catch (err) {
+        console.error('Error uploading recipe:', err);
+        throw err;
+    }
+}
