@@ -4,8 +4,8 @@ import SearchView from '../view/searchView.js';
 import ResultsView from '../view/resultsView.js';
 import PaginationView from '../view/paginationView.js';
 import AddRecipeView from '../view/addRecipeView.js';
+import BookmarksView from '../view/bookmarksView.js';
 
-import icons from 'url:../img/icons.svg';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
@@ -50,22 +50,22 @@ const renderError = function (parentEl, message = 'Could not load recipe!') {
 // Search controller
 const controlSearchResults = async function() {
     try {
+        console.log('controlSearchResults called');
+        
         // 1) Get search query
         const query = SearchView.getQuery();
         console.log('Search query:', query);
         if (!query) return;
-
+        
         // 2) Load search results
-        ResultsView.renderSpinner();
         await model.loadSearchResults(query);
-        console.log('Search results:', model.state.search.results);
-
+        console.log('Search results loaded:', model.state.search.results);
+        
         // 3) Render results
         controlPagination();
-
+        
     } catch (err) {
-        console.error('Search error:', err);
-        ResultsView.renderError(err.message);
+        console.error('Error in search:', err);
     }
 };
 
@@ -107,8 +107,14 @@ const controlRecipes = async function() {
     //Render recipe
     RecipeView.render(model.state.recipe);
     
+    // Set up bookmark handler after rendering
+    RecipeView.addHandlerBookmark(controlBookmark);
+    
     // Update active state in results
     ResultsView.updateActiveRecipe();
+    
+    // Update active state in bookmarks
+    BookmarksView.updateActiveRecipe();
   } catch (err) {
     console.error('Error loading recipe:', err);
     RecipeView.renderError(err.message);
@@ -119,6 +125,34 @@ const controlRecipes = async function() {
 const controlRecipeClick = function(id) {
   console.log('Recipe clicked, updating hash to:', id);
   window.location.hash = id;
+}
+
+// Bookmark controller
+const controlBookmark = function() {
+    console.log('controlBookmark called');
+    console.log('Current recipe:', model.state.recipe);
+    console.log('Is bookmarked:', model.state.recipe.bookmarked);
+    
+    if (!model.state.recipe.bookmarked) {
+        console.log('Adding bookmark');
+        model.addBookmark(model.state.recipe);
+    } else {
+        console.log('Removing bookmark');
+        model.deleteBookmark(model.state.recipe.id);
+    }
+    
+    console.log('Bookmarks after update:', model.state.bookmarks);
+    
+    // Update recipe view
+    RecipeView.render(model.state.recipe);
+    
+    // Update bookmarks view
+    BookmarksView.render(model.state.bookmarks);
+    
+    // Update search results if they exist
+    if (model.state.search.results.length > 0) {
+        controlPagination();
+    }
 }
 
 // Add recipe controller
@@ -154,6 +188,7 @@ const init = function() {
     SearchView.addHandlerSearch(controlSearchResults);
     PaginationView.addHandlerClick(controlPagination);
     ResultsView.addHandlerClick(controlRecipeClick);
+    BookmarksView.addHandlerClick(controlRecipeClick);
     AddRecipeView.addHandlerShowModal();
     AddRecipeView.addHandlerHideModal();
     AddRecipeView.addHandlerUpload(controlAddRecipe);
@@ -161,6 +196,9 @@ const init = function() {
     // Add event listeners for recipe loading
     window.addEventListener('hashchange', controlRecipes);
     window.addEventListener('load', controlRecipes);
+    
+    // Render bookmarks on load
+    BookmarksView.render(model.state.bookmarks);
     
     console.log('Event listeners added for hashchange and load');
 }

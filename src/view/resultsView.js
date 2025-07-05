@@ -69,6 +69,11 @@ class ResultsView {
                                 <use href="${icons}#icon-user"></use>
                             </svg>
                         </div>
+                        <div class="preview__bookmark ${result.bookmarked ? '' : 'hidden'}">
+                            <svg>
+                                <use href="${icons}#icon-bookmark-fill"></use>
+                            </svg>
+                        </div>
                     </div>
                 </a>
             </li>

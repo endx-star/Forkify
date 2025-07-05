@@ -1,11 +1,25 @@
 // Model for managing application state and API calls
 
+const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes/';
+
 const timeout = function (s) {
   return new Promise(function (_, reject) {
     setTimeout(function () {
       reject(new Error(`Request took too long! Timeout after ${s} second`));
     }, s * 1000);
   });
+};
+
+const getJSON = async function(url) {
+  try {
+    const res = await Promise.race([fetch(url), timeout(10)]);
+    const data = await res.json();
+    
+    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
+    return data;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const state = {
@@ -19,20 +33,81 @@ export const state = {
     bookmarks: [],
 }
 
+// Load bookmarks from localStorage
+const loadBookmarks = function() {
+    const storage = localStorage.getItem('bookmarks');
+    console.log('Loading bookmarks from localStorage:', storage);
+    if (storage) {
+        state.bookmarks = JSON.parse(storage);
+        console.log('Loaded bookmarks:', state.bookmarks);
+    } else {
+        console.log('No bookmarks found in localStorage');
+    }
+}
+
+// Save bookmarks to localStorage
+const persistBookmarks = function() {
+    localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks));
+}
+
+// Add bookmark
+export const addBookmark = function(recipe) {
+    console.log('addBookmark called with recipe:', recipe);
+    // Add bookmark
+    state.bookmarks.push(recipe);
+    
+    // Mark current recipe as bookmarked
+    if (state.recipe.id === recipe.id) state.recipe.bookmarked = true;
+    
+    console.log('Bookmarks after adding:', state.bookmarks);
+    persistBookmarks();
+}
+
+// Delete bookmark
+export const deleteBookmark = function(id) {
+    console.log('deleteBookmark called with id:', id);
+    // Delete bookmark
+    const index = state.bookmarks.findIndex(el => el.id === id);
+    state.bookmarks.splice(index, 1);
+    
+    // Mark current recipe as NOT bookmarked
+    if (state.recipe.id === id) state.recipe.bookmarked = false;
+    
+    console.log('Bookmarks after deleting:', state.bookmarks);
+    persistBookmarks();
+}
+
+// Check if recipe is bookmarked
+export const isBookmarked = function(id) {
+    return state.bookmarks.some(bookmark => bookmark.id === id);
+}
+
+// Initialize bookmarks
+loadBookmarks();
+
 export const loadRecipe = async function (id) {
     try {
         console.log('loadRecipe called with id:', id);
-        const res = await Promise.race([
-          fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`),
-          timeout(10),
-        ]);
-        const data = await res.json();
+        const data = await getJSON(`${API_URL}${id}`);
         console.log('Recipe API response:', data);
-        if (!res.ok) throw new Error(`${data.message} (${res.status})`);
-        const recipe = data.data.recipe;
+        
+        let { recipe } = data.data;
         
         // Update state
-        state.recipe = recipe;
+        state.recipe = {
+            id: recipe.id,
+            title: recipe.title,
+            publisher: recipe.publisher,
+            source_url: recipe.source_url,
+            image_url: recipe.image_url,
+            servings: recipe.servings,
+            cooking_time: recipe.cooking_time,
+            ingredients: recipe.ingredients,
+        };
+        
+        // Check if recipe is bookmarked
+        state.recipe.bookmarked = isBookmarked(state.recipe.id);
+        
         console.log('Recipe state updated:', state.recipe);
         
         return recipe;
@@ -42,39 +117,31 @@ export const loadRecipe = async function (id) {
     }
 }
 
-export const loadSearchResults = async function(query) {
-    try {
-        console.log('Loading search results for:', query);
-        state.search.query = query;
-        
-        const res = await Promise.race([
-            fetch(`https://forkify-api.herokuapp.com/api/v2/recipes?search=${query}`),
-            timeout(10),
-        ]);
-        
-        const data = await res.json();
-        console.log('API response:', data);
-        
-        if (!res.ok) throw new Error(`${data.message} (${res.status})`);
-        
-        state.search.results = data.data.recipes.map(rec => {
-            return {
-                id: rec.id,
-                title: rec.title,
-                publisher: rec.publisher,
-                image: rec.image_url,
-                key: rec.key,
-            };
-        });
-        
-        console.log('Processed results:', state.search.results);
-        state.search.page = 1;
-        
-    } catch (err) {
-        console.error('Error in loadSearchResults:', err);
-        throw err;
-    }
-}
+export const loadSearchResults = async function (query) {
+  try {
+    state.search.query = query;
+    console.log('Search query:', query);
+
+    const data = await getJSON(`${API_URL}?search=${query}`);
+    console.log('Search results:', data);
+
+    state.search.results = data.data.recipes.map(recipe => {
+      return {
+        id: recipe.id,
+        title: recipe.title,
+        publisher: recipe.publisher,
+        image: recipe.image_url,
+        ...(recipe.key && { key: recipe.key }),
+        bookmarked: isBookmarked(recipe.id)
+      };
+    });
+    state.search.page = 1;
+    console.log('Search results processed:', state.search.results);
+  } catch (err) {
+    console.error('Error loading search results:', err);
+    throw err;
+  }
+};
 
 export const getSearchResultsPage = function(page = state.search.page) {
     state.search.page = page;

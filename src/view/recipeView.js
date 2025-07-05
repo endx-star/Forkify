@@ -4,6 +4,7 @@ import icons from 'url:../img/icons.svg';
 class RecipeView {
     #parentElement = document.querySelector('.recipe');
     #data;
+    #bookmarkHandler;
 
     renderSpinner() {
         const markup = `
@@ -38,6 +39,21 @@ class RecipeView {
         const markup = this.#generateMarkup();
         this.#clear();
         this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+        
+        // Debug: Check if bookmark button exists
+        const bookmarkBtn = this.#parentElement.querySelector('.btn--bookmark');
+        console.log('Bookmark button found:', bookmarkBtn);
+        console.log('Recipe bookmarked:', data.bookmarked);
+        
+        // Add direct click handler to bookmark button
+        if (bookmarkBtn) {
+            console.log('Bookmark button HTML:', bookmarkBtn.outerHTML);
+            bookmarkBtn.addEventListener('click', function(e) {
+                console.log('Direct bookmark button click');
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        }
     }
 
     #clear() {
@@ -72,9 +88,9 @@ return `
           <use href="${icons}#icon-user"></use>
         </svg>
       </div>
-      <button class="btn--round">
+      <button class="btn--round btn--bookmark">
         <svg class="">
-          <use href="${icons}#icon-bookmark-fill"></use>
+          <use href="${icons}#icon-bookmark${this.#data.bookmarked ? '-fill' : ''}"></use>
         </svg>
       </button>
     </div>
@@ -118,6 +134,27 @@ return `
       </a>
     </div>
   `;
+    }
+
+    addHandlerBookmark(handler) {
+        // Remove existing event listener if any
+        this.#parentElement.removeEventListener('click', this.#bookmarkHandler);
+        
+        // Create new handler function
+        this.#bookmarkHandler = function(e) {
+            console.log('Click detected on:', e.target);
+            console.log('Closest button:', e.target.closest('.btn--bookmark'));
+            const btn = e.target.closest('.btn--bookmark');
+            if (!btn) return;
+            console.log('Bookmark button clicked');
+            e.preventDefault();
+            e.stopPropagation();
+            handler();
+        };
+        
+        // Add new event listener
+        this.#parentElement.addEventListener('click', this.#bookmarkHandler);
+        console.log('Bookmark event listener added');
     }
 }
 
